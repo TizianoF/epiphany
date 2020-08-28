@@ -41,6 +41,36 @@ class EpiDatabase
       return false;
     }
   }
+
+  public function prepareStmt($sql)
+  {
+  	$this->init();
+  	try
+  	{
+  		$sth = $this->dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+  		return $sth;
+  	}
+  	catch(PDOException $e)
+  	{
+  		EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()} - {$sql}"));
+  		return false;
+  	}
+  }
+
+  public function executeStmt($sth, $params = array())
+  {
+  	$this->init();
+  	try
+  	{
+  		$sth->execute($params);
+  		return $sth;
+  	}
+  	catch(PDOException $e)
+  	{
+  		EpiException::raise(new EpiDatabaseQueryException("Query error: {$e->getMessage()}"));
+  		return false;
+  	}
+  }
   
   public function insertId()
   {
